@@ -1,0 +1,36 @@
+doctype html
+html
+	head
+		meta(charset="UTF-8")
+		title Friends filter
+		meta(http-equiv='X-UA-Compatible', content='IE=edge')
+		meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1')
+		link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css")
+		link(rel="stylesheet", href="style.css")
+		script(src="//vk.com/js/api/openapi.js", type="text/javascript")
+		script(src="//code.jquery.com/jquery-2.2.1.min.js")
+		
+
+	body
+		.mr-wrapper
+			header.filter-header
+				span(class ="header-text")
+					| Выберите друзей
+				.x-wrapper
+					a(href="#")
+						img(src="img/x.png", alt="Accordeon")
+			.filter
+				.search-line
+					label(for="search" class = "search-input-label")
+					input(type="text" name = "search" class = "search-input" placeholder="Начните вводить имя друга")
+					input(type="text" name = "search" class = "search-input pull-right" placeholder="Название")
+				.left-col
+					.col-header
+						| Ваши друзья
+				.right-col
+					.col-header
+						| Друзья в списке
+			footer.filter-footer
+				a(href = "#" class="save-button" id = "saveButton")
+					| Сохранить
+		script(src="main.js")
