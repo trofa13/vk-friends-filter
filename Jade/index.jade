@@ -24,9 +24,12 @@ html
 					label(for="search" class = "search-input-label")
 					input(type="text" name = "search" class = "search-input" placeholder="Начните вводить имя друга")
 					input(type="text" name = "search" class = "search-input pull-right" placeholder="Название")
-				.left-col
+				div(class="left-col" id="allFriends")
 					.col-header
 						| Ваши друзья
+					ul.friends-list#friendsList
+						li#friendFirstName
+
 				.right-col
 					.col-header
 						| Друзья в списке
