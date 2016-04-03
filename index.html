@@ -18,15 +18,16 @@
       <div class="filter">
         <div class="search-line">
           <label for="search" class="search-input-label"></label>
-          <input type="text" name="search" placeholder="Начните вводить имя друга" class="search-input">
-          <input type="text" name="search" placeholder="Название" class="search-input pull-right">
+          <input type="text" name="search" placeholder="Начните вводить имя друга" id="leftSearch" class="search-input">
+          <input type="text" name="search" placeholder="Название" id="rightSearch" class="search-input pull-right">
         </div>
-        <div id="allFriends" class="left-col">
+        <div id="allFriends" ondragenter="return dragEnter(event)" ondrop="return dragDrop(event)" ondragover="return dragOver(event)" class="left-col">
           <div class="col-header">Ваши друзья</div>
           <ul id="friendsList" class="friends-list"></ul>
         </div>
-        <div class="right-col">
+        <div id="rightCol" class="right-col">
           <div class="col-header">Друзья в списке</div>
+          <ul id="rightList" class="friends-list"></ul>
         </div>
       </div>
       <footer class="filter-footer"><a href="#" id="saveButton" class="save-button">Сохранить</a></footer>
