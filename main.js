@@ -1,28 +1,190 @@
-VK.init({ 
-	apiId: 5380999
-  });
-VK.Auth.login(function (response){
-	if (response.session) {
-		console.log('successful auth')
-	} else {
-		console.log('Some problems with auth')
-	}
+VK.init({
+  apiId: 5380999
+});
+VK.Auth.login(function(response) {
+  if (response.session) {
+    console.log('successful auth')
+  } else {
+  	throw new Error ('Ошибка авторизации')
+  }
 })
 
+function genereateMarkup(friendsArr, list) {
+  for (var i = 0; i < friendsArr.length; i++) {
+    var li = document.createElement('li'),
+      img = document.createElement('img'),
+      span = document.createElement('span'),
+      cross = document.createElement('a');
+    li.setAttribute('draggable', true);
+    li.setAttribute("ondragstart", 'return dragStart(event)' )
+    li.setAttribute('data-id', friendsArr[i].uid);
+    li.className = 'friend-list-item';
 
-VK.api('friends.get', {'name_case': 'nom', 'fields':'photo_100'}, function(response) {
-                if (response.error) {
-                  console.log('response errror')
-                } else {
-                //    allFriends.textContent = 'Музыка на странице ' + response.response[0].first_name + ' ' + response.response[0].last_name;
-                }
-                console.log(response)
-                
-                for (var i=0; i<response.response.length; i++){
-                	var li = document.createElement('li');
-                	li.textContent = response.response[i].first_name + ' ' + response.response[i].last_name;
-                	friendsList.appendChild(li);
-                }
- });
+    img.setAttribute('src', friendsArr[i].photo_50);
+    img.className = 'friend-img';
+    li.appendChild(img);
+
+    span.textContent = friendsArr[i].first_name + ' ' + friendsArr[i].last_name;
+    span.className = 'friend-name';
+    li.appendChild(span);
+
+    cross.textContent = '+';
+    cross.setAttribute('href', '#')
+    cross.className = 'cross';
+    li.appendChild(cross);
+
+    list.appendChild(li);
+  }
+}
+
+//посылаем запрос в ВК
+VK.api('friends.get', {
+  'name_case': 'nom',
+  'fields': 'photo_50'
+}, function(response) {
+  if (response.error) {
+    console.log('response errror')
+  } else {
+//Проверяем есть ли уже сохраненный локально список друзей?
+if (localStorage.getItem('savedFriendsList')) {
+  var savedFriendsList = localStorage.getItem('savedFriendsList');
+  savedFriendsList = JSON.parse(savedFriendsList);
+//Если уже есть скохраненный список, то записываем его в лист отфильтрованных друзей
+  var filteredFriends = savedFriendsList;
+} else {
+//Если нет  сохраненного списка друзей, то создаем пустой массив
+  var filteredFriends = [];
+}
+
+    var vkResponse = response.response;
+//Пробегамемся по ответу от ВК и если в ответе есть те же друзья, что и в сохраненном списке, то удаляем их из ответа ВК
+    for(var i = 0; i<vkResponse.length; i++){
+      for(var j = 0; j<filteredFriends.length; j++){
+        if(vkResponse[i].uid == filteredFriends[j].uid){
+          vkResponse.splice(i,1);
+        }
+      }
+    }
+  }
+  //Отрисовываем разметку
+     genereateMarkup (vkResponse, friendsList)
+     if(filteredFriends.length>0){genereateMarkup (filteredFriends, rightList)}
+
+function toRightCol(e) {
+    if (e.target.tagName === 'A') {
+      e.preventDefault();
+      var userId = e.target.parentNode.dataset.id;
+      rightList.appendChild(e.target.parentNode);
+
+      for (i = 0; i < vkResponse.length; i++) {
+        if (vkResponse[i].uid == userId) {
+          filteredFriends.push(vkResponse[i])
+          vkResponse.splice(i, 1)
+          console.log(vkResponse)
+        }
+      }
+    }
+  }
+  //Навешиваем обработчик на левую колонку. Он удаляет элемент из массива ответа ВК и добавляет в массив отфильтрованных друзей
+  friendsList.addEventListener('click', toRightCol);
+
+  function toLeftCol (e) {
+    if (e.target.tagName === 'A') {
+      e.preventDefault();
+      var userId = e.target.parentNode.dataset.id;
+      friendsList.insertBefore(e.target.parentNode, friendsList.childNodes[0])
+
+      for (i = 0; i < filteredFriends.length; i++) {
+        if (filteredFriends[i].uid == userId) {
+          vkResponse.push(filteredFriends[i])
+          filteredFriends.splice(i, 1)
+        
+        }
+      }
+    }
+  }
+
+//Навешиваем обработчик на правую колонку. Он удаляет элемент из массива отфильтрованных друзей и возвращает его в массив ответа от ВК
+  rightCol.addEventListener('click', toLeftCol);
+//Drag And Drop
+/*------------  -------------*/
+function mover (id){
+  for (var i = 0; i<vkResponse.length; i++){
+    if (vkResponse[i].uid.indexOf(id) > -1) {
+        console.log('meass')
+        } 
+  }
+
+}
+// Поиск
+//Объявим функцию, рисующую разметку по результатам поиска
+function searchResultGenerateMarkup (input, friendsArr, list) {
+   //Объявим переменную результатов поиска - массив с объектами
+      var searchResult = [];
+      //Обнулим разметку в листе, если поиск не дал совпадений
+       list.innerHTML = '';
+       //Пробежим по массиву в левом столбце
+      for (var i = 0; i<friendsArr.length; i++) {
+        //объявим переменные для сравнения
+        var inputValue = input.value.trim().toLowerCase();
+        var friendName = friendsArr[i].first_name + friendsArr[i].last_name;
+        friendName = friendName.toLowerCase();
+        //Сравним значения
+        if (friendName.indexOf(inputValue) > -1) {
+          //обнулим разметку
+        list.innerHTML = '';
+        //запушим в массив с результатами посика
+        searchResult.push(friendsArr[i]);
+        //Нарисуем новую разметку
+        genereateMarkup (searchResult, list);
+        } 
+      }
+}
+  //Навешиваем обработчик на строку 2 поисков
+  document.querySelector('.search-line').addEventListener('input', function (e){
+    //Определим в каком именно столбце идет поиск
+    var theInput = e.target;
+    // Обработаем левый столбец
+    if (theInput == leftSearch){
+        searchResultGenerateMarkup (leftSearch, vkResponse, friendsList);
+    } else {
+      //Если в правом столбце есть элементы, то
+      if (filteredFriends.length>0) {
+        searchResultGenerateMarkup (rightSearch, filteredFriends, rightList);  
+      }
+    }
+  });
+
+  // Сохранение в LocalStorage 
+  saveButton.addEventListener('click', function(e) {
+    e.preventDefault();
+    localStorage.setItem('savedFriendsList', JSON.stringify(filteredFriends));
+  })
+
+});
+
+function dragStart (e) {
+  e.dataTransfer.effectAllowed="move";
+  e.dataTransfer.setData('text', e.target.dataset.id);
+  console.log(e.target.dataset.id)
+  return true;
+}
+
+function  dragEnter (e) {
+  e.preventDefault();
+  return true;
+}
+
+function dragOver (e){
+  e.preventDefault();
+}
+
+function dragDrop (e) {
+  var data = e.dataTransfer.getData('text');
+  mover(data);
+  console.log(data)
+  //e.stopPropagination();
+  return false;
+}
 
 

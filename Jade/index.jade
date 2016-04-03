@@ -9,6 +9,7 @@ html
 		link(rel="stylesheet", href="style.css")
 		script(src="//vk.com/js/api/openapi.js", type="text/javascript")
 		script(src="//code.jquery.com/jquery-2.2.1.min.js")
+
 		
 
 	body
@@ -22,17 +23,17 @@ html
 			.filter
 				.search-line
 					label(for="search" class = "search-input-label")
-					input(type="text" name = "search" class = "search-input" placeholder="Начните вводить имя друга")
-					input(type="text" name = "search" class = "search-input pull-right" placeholder="Название")
-				div(class="left-col" id="allFriends")
+					input(type="text" name = "search" class = "search-input" placeholder="Начните вводить имя друга" id="leftSearch")
+					input(type="text" name = "search" class = "search-input pull-right" placeholder="Название" id="rightSearch")
+				div(class="left-col", id="allFriends", ondragenter="return dragEnter(event)", ondrop="return dragDrop(event)", ondragover="return dragOver(event)")
 					.col-header
 						| Ваши друзья
 					ul.friends-list#friendsList
-						li#friendFirstName
 
-				.right-col
+				.right-col#rightCol
 					.col-header
 						| Друзья в списке
+					ul.friends-list#rightList
 			footer.filter-footer
 				a(href = "#" class="save-button" id = "saveButton")
 					| Сохранить
