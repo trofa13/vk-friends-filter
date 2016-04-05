@@ -1,6 +1,9 @@
-VK.init({
-  apiId: 5380999
-});
+var connectLink = document.querySelector('.connect-vk-link');
+var connectBlock = document.querySelector('.connect-vk');
+var mainContent = document.querySelector('.mr-wrapper');
+connectLink.addEventListener('click', function (e){
+  connectBlock.style.display = "none";
+  mainContent.style.display = "block"
 VK.Auth.login(function(response) {
   if (response.session) {
     console.log('successful auth')
@@ -8,6 +11,16 @@ VK.Auth.login(function(response) {
     throw new Error('Ошибка авторизации')
   }
 })
+
+})
+
+  VK.init({
+  apiId: 5380999
+});
+
+
+
+
 
 function genereateMarkup(friendsArr, list) {
   for (var i = 0; i < friendsArr.length; i++) {
@@ -18,6 +31,7 @@ function genereateMarkup(friendsArr, list) {
     // li.setAttribute('draggable', true);
     li.setAttribute('data-id', friendsArr[i].uid);
     li.className = 'friend-list-item';
+    li.className += ' draggable';
 
     img.setAttribute('src', friendsArr[i].photo_50);
     img.className = 'friend-img';
@@ -106,116 +120,182 @@ VK.api('friends.get', {
 
   //Навешиваем обработчик на правую колонку. Он удаляет элемент из массива отфильтрованных друзей и возвращает его в массив ответа от ВК
   rightCol.addEventListener('click', toLeftCol);
-  //Drag And Drop
-  /*------------  -------------*/
 
-  var draggable, dragItem;
-  document.addEventListener('mousedown', function(e) {
+  /*------------ Drag And Drop -------------*/
+  allLi = document.querySelectorAll('LI');
+  for (var i = 0; i < allLi.length; i++) {
+    var oneLi = allLi[i];
+    var dragObject = {};
+    oneLi.addEventListener('mousedown', function(e) {
+      e.preventDefault();
+      if (e.target.tagName != "LI") {
+        var elem = e.target.parentNode;
+      } else {
+        var elem = e.target;
+      }
+      dragObject.elem = elem;
+      dragObject.downX = e.pageX;
+      dragObject.downY = e.pageY;
+      dragObject.parent = elem.parentNode;
 
-    if (e.target.tagName === 'LI') {
-      draggable = true;
-      dragItem = e;
-      var pos = dragItem.target.getBoundingClientRect();
-      dragItem.target.style.position = "absolute";
-    }
+    })
 
     document.addEventListener('mousemove', function(e) {
-      var mousePos = e;
-      if (draggable) {
-        dragItem.target.style.top = e.clientY + window.scrollY - pos.height / 2 + 'px';
-        dragItem.target.style.left = e.clientX + window.scrollX - pos.width / 2 + 'px';
-        document.addEventListener('mouseup', function(e) {
-
-          var rightColPos = rightCol.getBoundingClientRect(),
-            rightColLeft = rightColPos.left,
-            rightColRight = rightColPos.right,
-            rightColTop = rightColPos.top,
-            rightColBottom = rightColPos.bottom,
-            fitsRightColWidth = ((mousePos.clientX > rightColLeft) && (mousePos.clientX < rightColRight)),
-            fitsRightColHeight = ((mousePos.clientY < rightColBottom) && (mousePos.clientY > rightColTop));
-
-          if (fitsRightColWidth && fitsRightColHeight) {
-            var userId = e.target.parentNode.dataset.id;
-
-            for (i = 0; i < vkResponse.length; i++) {
-              if (vkResponse[i].uid == userId) {
-                filteredFriends.push(vkResponse[i])
-                vkResponse.splice(i, 1)
-              }
-            }
-            friendsList.innerHTML = '';
-            rightList.innerHTML = '';
-            genereateMarkup(vkResponse, friendsList)
-            if (filteredFriends.length > 0) {
-              genereateMarkup(filteredFriends, rightList)
-            }
-          } else {
-            friendsList.innerHTML = '';
-            rightList.innerHTML = '';
-            genereateMarkup(vkResponse, friendsList)
-            if (filteredFriends.length > 0) {
-              genereateMarkup(filteredFriends, rightList)
-            }
-          }
-
-          var leftColPos = friendsList.getBoundingClientRect(),
-            leftColLeft = leftColPos.left,
-            leftColRight = leftColPos.right,
-            leftColTop = leftColPos.top,
-            leftColBottom = leftColPos.bottom,
-            fitsLeftColWidth = ((mousePos.clientX > leftColLeft) && (mousePos.clientX < leftColRight)),
-            fitsLeftColHeight = ((mousePos.clientY < leftColBottom) && (mousePos.clientY > leftColTop));
-
-          if (fitsLeftColWidth && fitsLeftColHeight) {
-            var userId = e.target.parentNode.dataset.id;
-
-            for (i = 0; i < filteredFriends.length; i++) {
-              if (filteredFriends[i].uid == userId) {
-                vkResponse.push(filteredFriends[i])
-                filteredFriends.splice(i, 1)
-              }
-            }
-            friendsList.innerHTML = '';
-            rightList.innerHTML = '';
-            genereateMarkup(vkResponse, friendsList)
-            if (filteredFriends.length > 0) {
-              genereateMarkup(filteredFriends, rightList)
-            }
-          } else {
-            friendsList.innerHTML = '';
-            rightList.innerHTML = '';
-            genereateMarkup(vkResponse, friendsList)
-            if (filteredFriends.length > 0) {
-              genereateMarkup(filteredFriends, rightList)
-            }
-          }
-          draggable = null;
-        })
+      //Проверяем зажат ли элемент
+      if (!dragObject.elem) {
+        return;
       }
-    })
-  })
+      if (!dragObject.avatar) {
+        var moveX = e.pageX - dragObject.downX;
+        var moveY = e.pageY - dragObject.downY;
+        if (Math.abs(moveX) < 3 && Math.abs(moveY) < 3) {
+          return;
+        }
+        dragObject.avatar = createAvatar(e);
+        if (!dragObject.avatar) {
+          dragObject = {};
+          return;
+        }
+        var coords = getCoords(dragObject.avatar);
+        dragObject.shiftX = dragObject.downX - coords.left;
+        dragObject.shiftY = dragObject.downY - coords.top;
 
-  // Поиск
+        startDrag(e);
+      }
+      dragObject.avatar.style.left = e.pageX - dragObject.shiftX + 'px';
+      dragObject.avatar.style.top = e.pageY - dragObject.shiftY + 'px';
+
+      return false;
+    })
+
+    document.addEventListener('mouseup', function(e) {
+      if (dragObject.avatar) {
+        finishDrag(e);
+      }
+      dragObject = {};
+    })
+
+    function createAvatar(e) {
+
+      // запомнить старые свойства, чтобы вернуться к ним при отмене переноса
+      var avatar = dragObject.elem;
+      var old = {
+        parent: avatar.parentNode,
+        nextSibling: avatar.nextSibling,
+        position: avatar.position || '',
+        left: avatar.left || '',
+        top: avatar.top || '',
+        zIndex: avatar.zIndex || ''
+      };
+
+      // функция для отмены переноса
+      avatar.rollback = function() {
+        old.parent.insertBefore(avatar, old.nextSibling);
+        avatar.style.position = old.position;
+        avatar.style.left = old.left;
+        avatar.style.top = old.top;
+        avatar.style.zIndex = old.zIndex
+      };
+
+      return avatar;
+    }
+
+    function startDrag(e) {
+      var avatar = dragObject.avatar;
+
+      document.body.appendChild(avatar);
+      avatar.style.zIndex = 9999;
+      avatar.style.position = 'absolute';
+    }
+
+    function getCoords(elem) { // кроме IE8-
+      var box = elem.getBoundingClientRect();
+
+      return {
+        top: box.top + pageYOffset,
+        left: box.left + pageXOffset
+      };
+    }
+
+    function mouseIsOver(col, mousePos) {
+      var ColPos = col.getBoundingClientRect(),
+        ColLeft = ColPos.left,
+        ColRight = ColPos.right,
+        ColTop = ColPos.top,
+        ColBottom = ColPos.bottom,
+        fitsColWidth = ((mousePos.clientX > ColLeft) && (mousePos.clientX < ColRight)),
+        fitsColHeight = ((mousePos.clientY < ColBottom) && (mousePos.clientY > ColTop));
+
+      if (fitsColWidth && fitsColHeight) {
+        return true;
+      }
+      return false;
+    };
+
+    function finishDrag(e) {
+      ///Переносим из левой колонки в правую
+      if (dragObject.parent == friendsList) {
+        if (mouseIsOver(rightCol, e)) {
+
+          var userId = dragObject.elem.dataset.id;
+          rightList.appendChild(dragObject.elem);
+          dragObject.elem.style = '';
+
+          for (i = 0; i < vkResponse.length; i++) {
+            if (vkResponse[i].uid == userId) {
+
+              filteredFriends.push(vkResponse[i])
+              vkResponse.splice(i, 1)
+            }
+          }
+        } else {
+          dragObject.avatar.rollback();
+        }
+      }
+      //переносим из правой колонки в левую
+      if (dragObject.parent == rightList) {
+        if (mouseIsOver(allFriends, e)) {
+          var userId = dragObject.elem.dataset.id;
+          friendsList.insertBefore(dragObject.elem, friendsList.childNodes[0])
+          dragObject.elem.style = '';
+
+          for (i = 0; i < filteredFriends.length; i++) {
+            if (filteredFriends[i].uid == userId) {
+              vkResponse.push(filteredFriends[i])
+              filteredFriends.splice(i, 1)
+
+            }
+          }
+
+        } else {
+          dragObject.avatar.rollback();
+        }
+      }
+    }
+  }
+
+  /*------------ ПОИСК -------------*/
   //Объявим функцию, рисующую разметку по результатам поиска
-  function searchResultGenerateMarkup(input, friendsArr, list) {
-    //Объявим переменную результатов поиска - массив с объектами
-    var searchResult = [];
+  function searchResultModifyMarkup(input, friendsArr, list) {
     //Обнулим разметку в листе, если поиск не дал совпадений
-    list.innerHTML = '';
+    var items = list.querySelectorAll('LI');
+    for (var i = 0; i < items.length; i++) {
+      items[i].style.display = 'none'
+    }
     //Пробежим по массиву в левом столбце
-    for (var i = 0; i < friendsArr.length; i++) {
-      //объявим переменные для сравнения
+    for (var i = 0; i < items.length; i++) {
+      console.log(items[i])
+        //объявим переменные для сравнения
       var inputValue = input.value.trim().toLowerCase();
       var friendName = friendsArr[i].first_name + friendsArr[i].last_name;
       friendName = friendName.toLowerCase();
       //Сравним значения
       if (friendName.indexOf(inputValue) > -1) {
         //обнулим разметку
-        list.innerHTML = '';
+        items[i].style.display = 'none';
         //запушим в массив с результатами посика
-        searchResult.push(friendsArr[i]);
         //Нарисуем новую разметку
-        genereateMarkup(searchResult, list);
+        items[i].style.display = 'block'
       }
     }
   }
@@ -225,11 +305,12 @@ VK.api('friends.get', {
     var theInput = e.target;
     // Обработаем левый столбец
     if (theInput == leftSearch) {
-      searchResultGenerateMarkup(leftSearch, vkResponse, friendsList);
+
+      searchResultModifyMarkup(leftSearch, vkResponse, friendsList);
     } else {
       //Если в правом столбце есть элементы, то
       if (filteredFriends.length > 0) {
-        searchResultGenerateMarkup(rightSearch, filteredFriends, rightList);
+        searchResultModifyMarkup(rightSearch, filteredFriends, rightList);
       }
     }
   });

@@ -37,6 +37,7 @@ $filter-width: 620px;
 .mr-wrapper{
 	width: $filter-width;
 	margin-top: 50px;
+	display: none;
 
 }
 /*------------ header section -------------*/
@@ -210,12 +211,16 @@ $filter-width: 620px;
 	cursor: pointer;
 
 }
-/* li{
-	display: none;
 
-	&:first-child{
-		display: block;
-	}
+.connect-vk{
+margin-top: 50vh;
+}
+
+.connect-vk-link{
+	text-decoration: none;
+	color: $dark-grey;
+	background-color: $white;
+	padding: 10px 20px;
+	border-radius: 10px;
 
 }
- */

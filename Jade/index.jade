@@ -10,9 +10,13 @@ html
 		script(src="//vk.com/js/api/openapi.js", type="text/javascript")
 		script(src="//code.jquery.com/jquery-2.2.1.min.js")
 
+
 		
 
 	body
+		.connect-vk
+				a(href="#").connect-vk-link
+					| Подключить ВК!
 		.mr-wrapper
 			header.filter-header
 				span(class ="header-text")
@@ -30,6 +34,7 @@ html
 						| Ваши друзья
 					ul.friends-list#friendsList
 
+
 				.right-col#rightCol
 					.col-header
 						| Друзья в списке
@@ -37,4 +42,5 @@ html
 			footer.filter-footer
 				a(href = "#" class="save-button" id = "saveButton")
 					| Сохранить
+
 		script(src="main.js")
