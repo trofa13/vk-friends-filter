@@ -1,0 +1,229 @@
+<<<<<<< HEAD
+=======
+/*------------ some imports happening ------------*/
+@import "_normalize";
+@import "_fonts";
+
+
+/*----------- some general ajustments -------------*/
+html {
+	width:100%;
+	height: 150%;
+	font-size: 100.01%;
+}
+
+body {
+	font: 15px/1.41 'fira_sansmedium';
+    -webkit-font-smoothing: antialiased;
+	width:100%;
+	background: #999999;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+*{
+	box-sizing: border-box;
+}
+
+/*------------- variables defenition -----------*/
+$white: #fff;
+$black: #4f4f4f;
+$orange: #ff8663;
+$light-grey: #f0f0f0;
+$dark-grey: #696666;
+
+$filter-width: 620px;
+
+/*------------- centering filter --------------*/
+.mr-wrapper{
+	width: $filter-width;
+	margin-top: 50px;
+	display: none;
+
+}
+/*------------ header section -------------*/
+.filter-header{
+	background-color: $orange;
+	height: 45px;
+	border-radius: 10px 10px 0 0;
+}
+
+.header-text{
+	color: $white;
+	float: left;
+	line-height: 45px;
+	margin-left: 15px;
+}
+
+.x-wrapper{
+	float: right;
+	margin: 15px;
+}
+
+/*------------ filter-body -------------*/
+.filter{
+	background-color: #fff;
+}	
+
+
+/*------------ search inputs -------------*/
+.search-line{
+	height: 45px;
+	background-color: $light-grey;
+	color: #000;
+}
+
+.search-input{
+	border: 2px solid $light-grey;
+	border-radius: 11px; 
+	height: 26px;
+	position: relative;
+	padding-left: 20px;
+	font-family: 'fira_sanslight';
+	font-size: 12px;
+	width: 270px;
+	margin-left: 15px;
+	margin-top: 10px;
+}
+
+.search-input:focus{
+	outline: 0 none;
+	border-radius: 11px;
+	border-color: $orange;
+	border: 2px solid $orange;
+}
+
+
+.search-input-label{
+	&:before{
+	color: $dark-grey;
+    content: "\f002";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    position: absolute;
+    z-index: 2;
+	margin-left: 20px;
+	margin-top: 12px;
+	}
+}
+
+
+.pull-right{
+	margin-right: -30px;
+}
+.col-header{
+	font-family: 'fira_sanslight';
+	font-size: 12px;
+	margin: 5px 15px;
+	border-bottom: 1px solid $light-grey;
+}
+
+.left-col{
+	width: $filter-width / 2 - 2;
+	height: 350px;
+	overflow-y: scroll;
+	display: inline-block;
+}
+
+.right-col{
+	width: $filter-width / 2 - 2;
+	height: 350px;
+	overflow-y: scroll;
+	display: inline-block;
+}
+.friends-list{
+	padding-left: 10px;
+}
+
+.friend-list-item{
+	width: 283px;
+	list-style: none;
+	margin: 10px 0;
+	padding-left: 5px;
+	&:hover{
+		background-color: $light-grey;
+	}
+}
+.friend-img{
+	border-radius: 50%;
+	display: inline-block;
+	vertical-align: middle;
+}
+.friend-name{
+	display: inline-block;
+	vertical-align: middle;
+	padding-left: 10px;
+	color: $dark-grey;
+}
+
+
+.cross{
+	text-decoration: none;
+	color: $dark-grey;
+	display: inline-block;
+	vertical-align: middle;
+	float: right;
+	padding:0 15px;	
+	font-size:32px;
+	cursor: pointer;
+
+}
+
+
+
+.cross{
+	text-decoration: none;
+	color: $dark-grey;
+	display: inline-block;
+	vertical-align: middle;
+	float: right;
+	padding:0 15px;	
+	font-size:32px;
+	cursor: pointer;
+
+}
+
+
+.right-col  .cross{
+	padding: 0;
+	margin:  0 15px; 	
+	transform: rotate(45deg);
+}
+
+/*------------ filter-footer -------------*/
+.filter-footer{
+	height: 45px;
+	background-color: $light-grey;
+	border-radius: 0 0 10px 10px;
+}
+
+.save-button{
+	text-decoration: none;
+	color: $white;
+	display: inline-block;
+	padding: 5px 20px;
+	font-family: 'fira_sanslight';
+	background-color: $orange;
+	border-radius: 9px;
+	margin-top: 6px;
+	margin-left: 500px;
+	cursor: pointer;
+
+}
+
+.connect-vk{
+margin-top: 50vh;
+}
+
+.connect-vk-link{
+	text-decoration: none;
+	color: $dark-grey;
+	background-color: $white;
+	padding: 10px 20px;
+	border-radius: 10px;
+
+}
+>>>>>>> gh-pages
