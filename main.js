@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 var connectLink = document.querySelector('.connect-vk-link');
 var connectBlock = document.querySelector('.connect-vk');
 var mainContent = document.querySelector('.mr-wrapper');
@@ -324,4 +322,4 @@ VK.api('friends.get', {
   })
 
 });
->>>>>>> gh-pages
+
