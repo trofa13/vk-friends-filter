@@ -1,62 +1,22 @@
+  VK.init({
+  apiId: 5380999
+});
+
 var connectLink = document.querySelector('.connect-vk-link');
 var connectBlock = document.querySelector('.connect-vk');
 var mainContent = document.querySelector('.mr-wrapper');
 connectLink.addEventListener('click', function (e){
   connectBlock.style.display = "none";
-  mainContent.style.display = "block"
+  mainContent.style.display = "block";
 VK.Auth.login(function(response) {
   if (response.session) {
-    console.log('successful auth')
-  } else {
-    throw new Error('Ошибка авторизации')
-  }
-})
-
-})
-
-  VK.init({
-  apiId: 5380999
-});
-
-
-
-
-
-function genereateMarkup(friendsArr, list) {
-  for (var i = 0; i < friendsArr.length; i++) {
-    var li = document.createElement('li'),
-      img = document.createElement('img'),
-      span = document.createElement('span'),
-      cross = document.createElement('a');
-    // li.setAttribute('draggable', true);
-    li.setAttribute('data-id', friendsArr[i].uid);
-    li.className = 'friend-list-item';
-    li.className += ' draggable';
-
-    img.setAttribute('src', friendsArr[i].photo_50);
-    img.className = 'friend-img';
-    li.appendChild(img);
-
-    span.textContent = friendsArr[i].first_name + ' ' + friendsArr[i].last_name;
-    span.className = 'friend-name';
-    li.appendChild(span);
-
-    cross.textContent = '+';
-    cross.setAttribute('href', '#')
-    cross.className = 'cross';
-    li.appendChild(cross);
-
-    list.appendChild(li);
-  }
-}
-
-//посылаем запрос в ВК
+    
 VK.api('friends.get', {
   'name_case': 'nom',
   'fields': 'photo_50'
 }, function(response) {
   if (response.error) {
-    console.log('response errror')
+    console.log('response errror');
   } else {
     //Проверяем есть ли уже сохраненный локально список друзей?
     if (localStorage.getItem('savedFriendsList')) {
@@ -80,38 +40,42 @@ VK.api('friends.get', {
     }
   }
   //Отрисовываем разметку
-  genereateMarkup(vkResponse, friendsList)
+  genereateMarkup(vkResponse, friendsList);
   if (filteredFriends.length > 0) {
-    genereateMarkup(filteredFriends, rightList)
+    genereateMarkup(filteredFriends, rightList);
   }
 
   function toRightCol(e) {
-    if (e.target.tagName === 'A') {
+    
       e.preventDefault();
       var userId = e.target.parentNode.dataset.id;
       rightList.appendChild(e.target.parentNode);
 
       for (i = 0; i < vkResponse.length; i++) {
         if (vkResponse[i].uid == userId) {
-          filteredFriends.push(vkResponse[i])
-          vkResponse.splice(i, 1)
+          filteredFriends.push(vkResponse[i]);
+          vkResponse.splice(i, 1);
         }
       }
-    }
+    
   }
   //Навешиваем обработчик на левую колонку. Он удаляет элемент из массива ответа ВК и добавляет в массив отфильтрованных друзей
-  friendsList.addEventListener('click', toRightCol);
+  friendsList.addEventListener('click', function(e) {
+     if (e.target.tagName === 'A') {
+    toRightCol(e);
+  }
+  });
 
   function toLeftCol(e) {
     if (e.target.tagName === 'A') {
       e.preventDefault();
       var userId = e.target.parentNode.dataset.id;
-      friendsList.insertBefore(e.target.parentNode, friendsList.childNodes[0])
+      friendsList.insertBefore(e.target.parentNode, friendsList.childNodes[0]);
 
       for (i = 0; i < filteredFriends.length; i++) {
         if (filteredFriends[i].uid == userId) {
-          vkResponse.push(filteredFriends[i])
-          filteredFriends.splice(i, 1)
+          vkResponse.push(filteredFriends[i]);
+          filteredFriends.splice(i, 1);
 
         }
       }
@@ -138,7 +102,7 @@ VK.api('friends.get', {
       dragObject.downY = e.pageY;
       dragObject.parent = elem.parentNode;
 
-    })
+    });
 
     document.addEventListener('mousemove', function(e) {
       //Проверяем зажат ли элемент
@@ -166,14 +130,14 @@ VK.api('friends.get', {
       dragObject.avatar.style.top = e.pageY - dragObject.shiftY + 'px';
 
       return false;
-    })
+    });
 
     document.addEventListener('mouseup', function(e) {
       if (dragObject.avatar) {
         finishDrag(e);
       }
       dragObject = {};
-    })
+    });
 
     function createAvatar(e) {
 
@@ -230,7 +194,7 @@ VK.api('friends.get', {
         return true;
       }
       return false;
-    };
+    }
 
     function finishDrag(e) {
       ///Переносим из левой колонки в правую
@@ -244,8 +208,8 @@ VK.api('friends.get', {
           for (i = 0; i < vkResponse.length; i++) {
             if (vkResponse[i].uid == userId) {
 
-              filteredFriends.push(vkResponse[i])
-              vkResponse.splice(i, 1)
+              filteredFriends.push(vkResponse[i]);
+              vkResponse.splice(i, 1);
             }
           }
         } else {
@@ -256,13 +220,13 @@ VK.api('friends.get', {
       if (dragObject.parent == rightList) {
         if (mouseIsOver(allFriends, e)) {
           var userId = dragObject.elem.dataset.id;
-          friendsList.insertBefore(dragObject.elem, friendsList.childNodes[0])
+          friendsList.insertBefore(dragObject.elem, friendsList.childNodes[0]);
           dragObject.elem.style = '';
 
           for (i = 0; i < filteredFriends.length; i++) {
             if (filteredFriends[i].uid == userId) {
-              vkResponse.push(filteredFriends[i])
-              filteredFriends.splice(i, 1)
+              vkResponse.push(filteredFriends[i]);
+              filteredFriends.splice(i, 1);
 
             }
           }
@@ -280,11 +244,11 @@ VK.api('friends.get', {
     //Обнулим разметку в листе, если поиск не дал совпадений
     var items = list.querySelectorAll('LI');
     for (var i = 0; i < items.length; i++) {
-      items[i].style.display = 'none'
+      items[i].style.display = 'none';
     }
     //Пробежим по массиву в левом столбце
     for (var i = 0; i < items.length; i++) {
-      console.log(items[i])
+      console.log(items[i]);
         //объявим переменные для сравнения
       var inputValue = input.value.trim().toLowerCase();
       var friendName = friendsArr[i].first_name + friendsArr[i].last_name;
@@ -295,7 +259,7 @@ VK.api('friends.get', {
         items[i].style.display = 'none';
         //запушим в массив с результатами посика
         //Нарисуем новую разметку
-        items[i].style.display = 'block'
+        items[i].style.display = 'block';
       }
     }
   }
@@ -319,7 +283,58 @@ VK.api('friends.get', {
   saveButton.addEventListener('click', function(e) {
     e.preventDefault();
     localStorage.setItem('savedFriendsList', JSON.stringify(filteredFriends));
-  })
+  });
 
 });
 
+
+
+
+
+
+
+
+
+  } else {
+    alert('Вы не авторизовались и не увидете всей прелести:(');
+    //throw new Error('Ошибка авторизации');
+  }
+});
+
+});
+
+
+
+
+
+
+
+function genereateMarkup(friendsArr, list) {
+  for (var i = 0; i < friendsArr.length; i++) {
+    var li = document.createElement('li'),
+      img = document.createElement('img'),
+      span = document.createElement('span'),
+      cross = document.createElement('a');
+    // li.setAttribute('draggable', true);
+    li.setAttribute('data-id', friendsArr[i].uid);
+    li.className = 'friend-list-item';
+    li.className += ' draggable';
+
+    img.setAttribute('src', friendsArr[i].photo_50);
+    img.className = 'friend-img';
+    li.appendChild(img);
+
+    span.textContent = friendsArr[i].first_name + ' ' + friendsArr[i].last_name;
+    span.className = 'friend-name';
+    li.appendChild(span);
+
+    cross.textContent = '+';
+    cross.setAttribute('href', '#');
+    cross.className = 'cross';
+    li.appendChild(cross);
+
+    list.appendChild(li);
+  }
+}
+
+//посылаем запрос в ВК
